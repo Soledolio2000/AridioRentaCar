@@ -6,7 +6,8 @@
 @inject IVehiculoManager VehiculoManager;
 @inject IClienteManager ClienteManager;
 
-
-@* @using PayPalCheckoutSdk.Core; *@
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize(Roles="Administrador, Empleado")]
 
 

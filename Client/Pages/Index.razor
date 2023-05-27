@@ -1,11 +1,10 @@
-﻿@page "/"
-@inject NavigationManager nvg
+﻿@page "/Index"
 
-@using Aridio_Rent_A_Car.Client.Pages;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize(Roles="Administrador, Empleado")]
 
 
-
-<button class="btn btn-primary" value="login" @onclick="Gotologin">Login</button>
 
 <PageTitle >Aridio Renta Car</PageTitle>
 
@@ -13,16 +12,11 @@
 
 
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+
+<AuthorizeView>
+    <Authorized>
+        <h1>Bienvenido @context.User.Identity!.Name</h1>
+    </Authorized>
+</AuthorizeView>
 
 
-
-
-@code {
-    void Gotologin()
-    {
-        nvg.NavigateTo("/auth/login");
-    }
-
-   
-}
