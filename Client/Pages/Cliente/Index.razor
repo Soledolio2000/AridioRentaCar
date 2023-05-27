@@ -1,0 +1,89 @@
+@page "/clientes"
+<h1 style="color: darkblue;">Clientes</h1>
+<br>
+
+<button class="btn btn-outline-primary" @onclick="Agregar">Agregar</button>
+
+<br>
+
+
+@if(clientes != null)
+{
+    <br>
+<table class="table table-hover table-dark">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Direccón</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Nacionalidad</th>
+            <th scope="col">Cédula</th>
+            <th scope="col">Ocupación</th>
+            <th scope="col">Pasaporte</th>
+            <th scope="col">Licencia</th>
+            <th scope="col">Fecha Expiracion Licencia</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var clien in clientes)
+        {
+            <tr>
+                <th scope="row">@clien.Id</th>
+                <th scope="row">@clien.Nombre</th>
+                <th scope="row">@clien.Direccion</th>
+                <th scope="row">@clien.Telefono</th>
+                <th scope="row">@clien.Nacionalidad</th>
+                <th scope="row">@clien.Cedula</th>
+                <th scope="row">@clien.Ocupacion</th>
+                <th scope="row">@clien.Pasaporte</th>
+                <th scope="row">@clien.Licencia</th>
+                <th scope="row">@clien.FechaExpiracionLicencia.ToString("dd/MM/yyyy")</th>
+                <th scope="row"><button class="btn btn-outline-warning " @onclick="()=>Editar(clien.Id)">Editar</button></th>
+                <th scope="row"><button class="btn btn-outline-danger " @onclick="()=>Eliminar(clien.Id)">Eliminar</button></th> 
+            </tr>
+        }
+    </tbody>
+</table>
+}
+else
+{
+    <p>No hay clientes registrados...</p>
+}
+
+
+<br>
+@code
+{
+    public List<ClienteRecord>? clientes {get; set;}
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await ClienteManager.GetAsync();
+        if(response.Succeeded)
+        {
+            clientes = response.Items.ToList();
+        }
+
+    }
+
+
+    public void Agregar()
+    {
+        urlHelper.NavigateTo("/clientes/crear",false);
+    }
+
+    public void Editar(int Id)
+    {
+        urlHelper.NavigateTo($"/clientes/editar/{Id}",false);
+    }
+
+
+
+    public void Eliminar(int Id)
+    {
+        urlHelper.NavigateTo($"/clientes/eliminar/{Id}",false);
+    }
+}

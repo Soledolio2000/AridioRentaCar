@@ -1,0 +1,110 @@
+@page "/clientes/crear"
+@page "/clientes/editar/{Id:int}"
+@page "/clientes/eliminar/{Id:int}"
+
+
+
+<EditForm Model="@Clien" OnInvalidSubmit="Send">
+<h1>@Titulo</h1>
+<DataAnnotationsValidator/>
+<ValidationSummary/>
+<br>
+    <div class="form-group">
+        <label>Nombre Completo</label>
+        <InputText class="form-control" @bind-Value="Clien.Nombre"></InputText>
+    </div>
+<br>
+    <div class="form-group">
+        <label>Direccón</label>
+        <InputText class="form-control" @bind-Value="Clien.Direccion"></InputText>
+    </div>
+<br>
+    <div class="form-group">
+        <label>Teléfono</label>
+        <InputText class="form-control" @bind-Value="Clien.Telefono"></InputText>
+    </div>
+<br>
+    <div class="form-group">
+        <label>Nacionalidad</label>
+        <InputText class="form-control" @bind-Value="Clien.Nacionalidad"></InputText>
+    </div>
+<br>
+    <div class="form-group">
+        <label>Cédula</label>
+        <InputText class="form-control" @bind-Value="Clien.Cedula"></InputText>
+    </div>
+<br>
+    <div class="form-group">
+        <label>Ocupación</label>
+        <InputText class="form-control" @bind-Value="Clien.Ocupacion"></InputText>
+    </div>
+<br>
+    <div class="form-group">
+        <label>Pasaporte</label>
+        <InputText class="form-control" @bind-Value="Clien.Pasaporte"></InputText>
+    </div>
+<br>
+    <div class="form-group">
+        <label>Licencia</label>
+        <InputText class="form-control" @bind-Value="Clien.Licencia"></InputText>
+    </div>
+<br>
+<div class="form-group">
+    <label>Fecha de expiracion licencia</label>
+    <input id="fecha-expiracion-licencia" type="text" class="form-control" @ref="dateInput" @bind="@Clien.FechaExpiracionLicencia" />
+</div>
+    <br>
+    <button type="submit" class="btn btn-success" @onclick="Send">Ok</button>
+    <br>
+</EditForm>
+
+@code
+{
+    [Parameter]
+
+    public int Id {get; set;} = 0;
+
+    public string Titulo => Id>0? "Editar clientes":"Crear clientes";
+
+    public ClienteUpdateRequest Clien {get; set;} = new ClienteUpdateRequest();
+
+protected override async Task OnInitializedAsync()
+{
+    if(Id!=0){
+        var resultado = await ClienteManager.GetByIdAsync(Id);
+        if(resultado.Succeeded){
+            Clien.Id = resultado.Data.Id;
+            Clien.Nombre = resultado.Data.Nombre;
+            Clien.Direccion = resultado.Data.Direccion;
+            Clien.Telefono = resultado.Data.Telefono;
+            Clien.Nacionalidad = resultado.Data.Nacionalidad;
+            Clien.Cedula = resultado.Data.Cedula;
+            Clien.Ocupacion = resultado.Data.Ocupacion;
+            Clien.Pasaporte = resultado.Data.Pasaporte;
+            Clien.Licencia = resultado.Data.Licencia;
+            Clien.FechaExpiracionLicencia = resultado.Data.FechaExpiracionLicencia;
+            StateHasChanged();
+        }
+    }
+}
+
+
+    private ElementReference dateInput;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("initializeFlatpickr", dateInput);
+        }
+    }
+
+
+public async void Send()
+{
+    var resultado = await ClienteManager.CreateAsync(Clien);
+
+    if(resultado.Succeeded) urlHelper.NavigateTo("/clientes");
+}
+
+}

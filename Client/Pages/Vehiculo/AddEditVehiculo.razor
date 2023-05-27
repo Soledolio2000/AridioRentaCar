@@ -1,0 +1,119 @@
+@page "/vehiculo/crear"
+@page "/vehiculo/editar/{Id:int}"
+@page "/vehiculo/eliminar/{Id:int}"
+
+
+<EditForm Model="@Vehi" OnInvalidSubmit="Send">
+<h1>@Titulo</h1>
+<DataAnnotationsValidator/>
+<ValidationSummary/>
+    <div class="form-group">
+        <label>Marca</label>
+        <InputText class="form-control" @bind-Value="Vehi.Marca"></InputText>
+    </div>
+
+    <div class="form-group">
+        <label>Modelo</label>
+        <InputText class="form-control" @bind-Value="Vehi.Modelo"></InputText>
+    </div>
+
+    <div class="form-group">
+        <label>Año</label>
+        <input type="number" class="form-control" @bind ="Vehi.Año" />
+    </div>
+
+    <div class="form-group">
+        <label>Color</label>
+        <InputText class="form-control" @bind-Value="Vehi.Color"></InputText>
+    </div>
+    <div class="form-group">
+        <label>Numero de placa</label>
+        <InputText class="form-control" @bind-Value="Vehi.NumeroPlaca"></InputText>
+    </div>
+    <div class="form-group">
+        <label>Precio por dia</label>
+        <input type="number" class="form-control" @bind="Vehi.PrecioPorDia" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox id="ckbActivo" @bind-Value="Vehi.Activo"/>
+        <label for="ckbActivo">Activo</label>
+    </div>
+    <br>
+        <div class="form-group">
+        <InputCheckbox id="ckbInactivo" @bind-Value="Vehi.Inactivo"/>
+        <label for="ckbInactivo">Inactivo</label>
+    </div>
+    <br>
+    <div class="form-group">
+        <label>Estado de Vehiculo</label>
+        <br>
+        <textarea name="" id="" cols="50" rows="4" @bind="Vehi.Mensaje"></textarea>
+    </div>
+
+<br>
+
+<button type="submit" class="mt-2 btn btn-success" @onclick="Send">Ok</button>
+
+</EditForm>  
+
+
+
+
+@code
+{
+
+
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+    public string Titulo => Id>0? "Editar vehiculo" : "Crear vehiculo";
+
+    public VehiculoUpdateRequest Vehi {get; set;} = new VehiculoUpdateRequest();
+
+ 
+
+        protected override async Task OnInitializedAsync()
+        {
+            
+            if(Id!=0){
+                var resultado = await VehiculoManager.GetByIdAsync(Id);
+                if(resultado.Succeeded)
+                {
+                    Vehi.Id = resultado.Data.Id;
+                    Vehi.Marca = resultado.Data.Marca;
+                    Vehi.Modelo = resultado.Data.Modelo;
+                    Vehi.Año = resultado.Data.Año;
+                    Vehi.Color = resultado.Data.Color;
+                    Vehi.NumeroPlaca = resultado.Data.NumeroPlaca;
+                    Vehi.PrecioPorDia = resultado.Data.PrecioPorDia;
+                    Vehi.Mensaje = resultado.Data.Mensaje;
+                    Vehi.Activo = resultado.Data.Activo;
+                    Vehi.Inactivo = resultado.Data.Inactivo;
+
+                }
+            }
+        }
+
+     
+        
+        public async void Send()
+        {
+            var resultado = await VehiculoManager.CreateAsync(Vehi);
+
+            if(resultado.Succeeded) urlHelper.NavigateTo("/vehiculo");
+        }
+
+
+
+
+
+        private bool showForm = false;
+
+    private void ToggleForm()
+    {
+        showForm = !showForm;
+    }
+
+    
+
+}

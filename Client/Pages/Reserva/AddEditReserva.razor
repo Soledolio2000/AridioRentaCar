@@ -1,0 +1,202 @@
+@page "/reservas/crear"
+@page "/reservas/editar/{Id:int}"
+@page "/reservas/eliminar/{Id:int}"
+
+<EditForm Model="@res"  OnInvalidSubmit="Send">
+<h1>@Titulo</h1>
+<DataAnnotationsValidator/>
+<ValidationSummary/>
+    <div class="form-group">
+        <label>Fecha de inicio</label>
+        <input type="date" class="form-control" @bind="res.FechaInicio" />
+    </div>
+<br>
+    <div class="form-group">
+        <label>Fecha culminacion</label>
+        <input type="date" class="form-control" @bind="res.FechaFin" />
+    </div>
+<br>
+    <div class="form-group">
+        <label>Vehiculo</label>
+        <select @bind="SelectedVehicleId">
+            <option value="0">Seleccione vehiculo</option>
+            @if(VehiculosRegistrados != null && VehiculosRegistrados.Items != null)
+            {
+            @foreach (var vehiculo in VehiculosRegistrados.Items)
+            {
+                <option value="@vehiculo.Id">@($"{vehiculo.Marca} {vehiculo.Modelo}")</option>
+            }
+            }
+
+        </select>
+    </div>
+<br>
+    <div class="form-group">
+        <label>Cliente</label>
+        <select @bind="SelectedClientId">
+            <option value="0">Seleccione cliente</option>
+            @if(ClientesRegistrados != null && ClientesRegistrados.Items != null)
+            {
+            @foreach (var cliente in ClientesRegistrados.Items)
+            {
+                <option value="@cliente.Id">@($"{cliente.Nombre} {cliente.Cedula}")</option>
+            }
+            }
+
+        </select>
+    </div>
+<br>
+    <div class="form-group">
+        <label for="duracion">Duración de la renta ("Dias"):</label>
+        <input type="number" id="duracion" @bind="res.Dias" />
+    </div>
+<br>
+    <div class="form-group">
+        <label for="pagado">Precio renta ("Dias")</label>
+        <input type="number" id="pagado" @bind="res.precioRenta" />
+    </div>
+<br>
+<br>
+    <div class="form-group">
+        <label for="preciototal">Precio total a pagar:</label>
+        <input type="number" id="presiototal" value="@TotalRentalPrice" readonly />
+    </div>
+<br>
+    <div class="form-group">
+        <label>Forma de Pago</label>
+        <input type="text" @bind="res.FormaDePagoId">
+    </div>
+<br>
+  
+
+    <button type="submit" class="btn btn-success" @onclick="Send">Ok</button>
+</EditForm>
+
+@code
+{
+    [Parameter]
+
+    public int Id {get; set;} = 0;
+
+    public string Titulo => Id>0? "Editar reservas":"Crear reservas";
+
+    public ReservaUpdateRequest res {get; set;} = new ReservaUpdateRequest();
+
+
+
+    private int SelectedVehicleId { get; set; }
+    private ResultList<VehiculoRecord>? VehiculosRegistrados { get; set; }
+    private string? ErrorMessage {get; set;}
+
+
+    private int SelectedClientId {get; set;}
+    private ResultList<ClienteRecord>? ClientesRegistrados {get; set;}
+
+
+    private decimal TotalRentalPrice => res.PrecioTotal * res.Dias;
+
+
+protected override async Task OnInitializedAsync()
+{
+    try
+        {
+            VehiculosRegistrados = await VehiculoManager.GetAsync();
+        }
+        catch(Exception e)
+            {
+                ErrorMessage = "Ocurrio un error al obteenr los vehiculos" + e.Message;
+            }
+
+
+        try
+        {
+            ClientesRegistrados = await ClienteManager.GetAsync();
+        }
+        catch(Exception e)
+            {
+                ErrorMessage = "Ocurrio un error al obteenr los vehiculos" + e.Message;
+            }
+
+
+
+    if(Id!=0){
+        var resultado = await ReservaManager.GetByIdAsync(Id);
+        if(resultado.Succeeded){
+            res.Id = resultado.Data.Id;
+            res.FechaInicio = resultado.Data.FechaInicio;
+            res.FechaFin = resultado.Data.FechaFin;
+            res.VehiculoId = resultado.Data.VehiculoId;
+            res.ClienteId = resultado.Data.ClienteId;
+            res.Dias = resultado.Data.Dias;
+            res.PrecioTotal = resultado.Data.PrecioTotal;
+            res.precioRenta = resultado.Data.precioRenta;
+            res.FormaDePagoId = resultado.Data.FormaDePagoId;
+            StateHasChanged();
+        }
+    }
+}
+
+public async void Send()
+{
+
+    // Calcula el precio total de la renta antes de enviar los datos
+    res.PrecioTotal  = res.Dias * res.precioRenta;
+
+    if(Id != 0)
+    {
+        var resulatdo = await ReservaManager.GetAsync();
+        if(resulatdo.Succeeded)
+        {
+            urlHelper.NavigateTo("/reservas");
+        }
+    }
+    else
+    {
+        var resultado = await ReservaManager.CreateAsync(res);
+        if(resultado.Succeeded)
+        {
+            urlHelper.NavigateTo("/reservas");
+        }
+    }
+
+
+    
+
+     urlHelper.NavigateTo("/reservas");
+}
+
+private void Reservar()
+{
+    if (SelectedVehicleId != 0)
+    {
+        var vehiculoSeleccionado = VehiculosRegistrados?.Items.FirstOrDefault(v => v.Id == SelectedVehicleId);
+        if (vehiculoSeleccionado != null)
+        {
+             res.VehiculoId = SelectedVehicleId;
+            // Realizar la reserva con el vehículo seleccionado
+            // ...
+        }
+    }
+}
+
+
+private void Clientela()
+{
+    if (SelectedClientId != 0)
+    {
+        var clienteSeleccionado = ClientesRegistrados?.Items.FirstOrDefault(c => c.Id == SelectedClientId);
+        if (clienteSeleccionado != null)
+        {
+             res.ClienteId = SelectedClientId;
+            // Realizar la reserva con el vehículo seleccionado
+            // ...
+        }
+    }
+
+}
+
+
+
+
+
+}

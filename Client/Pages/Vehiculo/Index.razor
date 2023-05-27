@@ -1,0 +1,149 @@
+@page "/vehiculo"
+
+
+
+<table class="table">
+    <thead>
+        <tr class= "bg-warning">
+            <th>Vehiculos disponibles:</th>
+            <th>Vehiculos no-disponibles</th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+            <tr>
+                <td class= "bg-success">
+                    <span>@cantidadAutosActivos</span>
+                </td>
+                
+                <td class= "bg-danger">
+                    <span>@cantidadAutosInactivos</span>
+                </td>
+
+            </tr>
+
+    </tbody>
+</table>
+
+
+
+
+
+<br>
+<h1 style="color: darkblue;">Vehiculos</h1>
+<br>
+<button class="btn btn-outline-primary" @onclick="Agregar">Agregar</button>
+<br>
+<br>
+
+@if(Vehiculos != null )
+{
+    <br>
+<table class="table table-hover table-dark">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Marca</th>
+            <th scope="col">Modelo</th>
+            <th scope="col">Año</th>
+            <th scope="col">Color</th>
+            <th scope="col">Placa</th>
+            <th scope="col">PrecioPorDia</th>
+            <th scope="col">Mensaje</th>
+            <th scope="col">Estado Vehiculo</th>
+            @* <th>Inactivo</th> *@
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var vehi in Vehiculos)
+        {
+            <tr>
+                <th scope="row">@vehi.Id</th>
+                <th scope="row">@vehi.Marca</th>
+                <th scope="row">@vehi.Modelo</th>
+                <th scope="row">@vehi.Año</th>
+                <th scope="row">@vehi.Color</th>
+                <th scope="row">@vehi.NumeroPlaca</th>
+                <th scope="row">@vehi.PrecioPorDia</th>
+                <th scope="row">@vehi.Mensaje</th>
+                <th scope="row">                        
+                    @if (vehi.Activo)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactivo</span>
+                        }
+                </th>
+                @* <td>
+                    @if (vehi.Inactivo)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactivo</span>
+                        }
+                </td> *@
+                <th scope="row">
+                    <button class="btn btn-outline-warning " @onclick="()=>Editar(vehi.Id)">Editar</button>
+                    
+                </th>
+                <th scope="row"><button class="btn btn-outline-danger" @onclick="()=>Eliminar(vehi.Id)">Eliminar</button>
+                    
+                </th> 
+            </tr>
+        }
+    </tbody>
+</table>
+}
+else
+{
+    <p>No hay vehiculos registrados...</p>
+}
+
+@* <p>Disponible: @cantidadAutosActivos</p>
+<p>No Disponible: @cantidadAutosInactivos</p> *@
+
+@code
+{
+
+    private List<VehiculoRecord>? vehiculos;
+
+    
+    private int cantidadAutosActivos;
+    private int cantidadAutosInactivos;
+
+
+    public List<VehiculoRecord>? Vehiculos { get; set; }
+        protected override async Task OnInitializedAsync()
+        {
+            var response = await VehiculoManager.GetAsync();
+            if(response.Succeeded){
+            Vehiculos = response.Items.ToList(); 
+            cantidadAutosActivos = Vehiculos.Count(v => v.Activo == true);
+            cantidadAutosInactivos = Vehiculos.Count(v => v.Activo == false); 
+            }
+        }
+
+        public void Agregar()
+        {
+            urlHelper.NavigateTo("/vehiculo/crear",false);
+        }
+
+            public void Editar(int Id)
+        {
+            urlHelper.NavigateTo($"/vehiculo/editar/{Id}",false);
+        }
+
+        public void Eliminar(int Id)
+        {
+            urlHelper.NavigateTo($"/vehiculo/Eliminar/{Id}",false);
+        }
+} 
+
+

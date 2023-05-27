@@ -1,0 +1,28 @@
+﻿@page "/"
+@inject NavigationManager nvg
+
+@using Aridio_Rent_A_Car.Client.Pages;
+
+
+
+<button class="btn btn-primary" value="login" @onclick="Gotologin">Login</button>
+
+<PageTitle >Aridio Renta Car</PageTitle>
+
+<h1 style="color: darkorange;">Aridio Renta Car</h1>
+
+
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+
+
+
+@code {
+    void Gotologin()
+    {
+        nvg.NavigateTo("/auth/login");
+    }
+
+   
+}
