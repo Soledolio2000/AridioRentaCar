@@ -17,8 +17,7 @@ public class Reserva
     public int Dias { get; set; }
     public decimal PrecioTotal { get; set; }
     public decimal precioRenta { get; set; }
-    public int FormaDePagoId { get; set; }
-    public virtual FormaDePago FormaDePago { get; set; } = null!;
+    public string Pago {get; set;} = null!;
 
     public static Reserva Crear(ReservaCreateRequest request)
     {
@@ -30,7 +29,7 @@ public class Reserva
             Dias = request.Dias,
             PrecioTotal = request.PrecioTotal,
             precioRenta= request.precioRenta,
-            FormaDePagoId = request.FormaDePagoId,
+            Pago = request.Pago,
         };
     }
 
@@ -50,12 +49,12 @@ public class Reserva
             PrecioTotal = request.PrecioTotal;
         if(precioRenta != request.precioRenta)
             precioRenta = request.precioRenta;
-        if(FormaDePagoId != request.FormaDePagoId)
-            FormaDePagoId = request.FormaDePagoId;
+        if(Pago != request.Pago)
+            Pago = request.Pago;
     }
 
     public ReservaRecord ToRecord()
     {
-        return new ReservaRecord(Id, FechaInicio, FechaFin, VehiculoId, Vehiculo.ToRecord(), ClienteId, Cliente.ToRecord(), Dias, PrecioTotal, precioRenta, FormaDePagoId, FormaDePago.ToRecord());
+        return new ReservaRecord(Id, FechaInicio, FechaFin, VehiculoId, Vehiculo.ToRecord(), ClienteId, Cliente.ToRecord(), Dias, PrecioTotal, precioRenta, Pago);
     }
 }

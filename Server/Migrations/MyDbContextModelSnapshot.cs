@@ -70,23 +70,6 @@ namespace Aridio_Rent_A_Car.Server.Migrations
                     b.ToTable("Clientes");
                 });
 
-            modelBuilder.Entity("Aridio_Rent_A_Car.Server.Models.FormaDePago", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FormasDePago");
-                });
-
             modelBuilder.Entity("Aridio_Rent_A_Car.Server.Models.Reserva", b =>
                 {
                     b.Property<int>("Id")
@@ -107,8 +90,9 @@ namespace Aridio_Rent_A_Car.Server.Migrations
                     b.Property<DateTime>("FechaInicio")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("FormaDePagoId")
-                        .HasColumnType("int");
+                    b.Property<string>("Pago")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PrecioTotal")
                         .HasColumnType("decimal(18,2)");
@@ -122,8 +106,6 @@ namespace Aridio_Rent_A_Car.Server.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
-
-                    b.HasIndex("FormaDePagoId");
 
                     b.HasIndex("VehiculoId");
 
@@ -238,12 +220,6 @@ namespace Aridio_Rent_A_Car.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Aridio_Rent_A_Car.Server.Models.FormaDePago", "FormaDePago")
-                        .WithMany()
-                        .HasForeignKey("FormaDePagoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Aridio_Rent_A_Car.Server.Models.Vehiculo", "Vehiculo")
                         .WithMany()
                         .HasForeignKey("VehiculoId")
@@ -251,8 +227,6 @@ namespace Aridio_Rent_A_Car.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Cliente");
-
-                    b.Navigation("FormaDePago");
 
                     b.Navigation("Vehiculo");
                 });

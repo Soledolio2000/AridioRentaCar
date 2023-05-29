@@ -7,5 +7,6 @@ public class ReservaUpdateRequest : ReservaCreateRequest
 {
     [Required(ErrorMessage = "Ingrese un Id valido")    ]
     public int Id { get; set; }
+    
 
 }

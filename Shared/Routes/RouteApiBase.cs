@@ -26,14 +26,6 @@ public class EstadoVehiculoRouteManager: RouteApiBase
     public static string BuildRouteDelete(int Id) => Delete.Replace(IdParameter,Id.ToString());
 }
 
-public class FormaDePagoRouteManager: RouteApiBase
-{
-    public const string BASE = $"{API}/formasdepago";
-    public const string GetById = $"{BASE}/{IdParameter}";
-    public static string BuildRoute(int Id) => GetById.Replace(IdParameter,Id.ToString());
-    public const string Delete = $"{BASE}/eliminar/{IdParameter}";
-    public static string BuildRouteDelete(int Id) => Delete.Replace(IdParameter,Id.ToString());
-}
 
 public class ReservaRouteManager: RouteApiBase
 {

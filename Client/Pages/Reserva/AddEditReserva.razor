@@ -62,16 +62,19 @@
         <input type="number" id="presiototal" value="@TotalRentalPrice" readonly />
     </div>
 <br>
-    <div class="form-group">
-        <label>Forma de Pago</label>
-    <select @bind="res.FormaDePagoId">
+
+<div class="form-group">
+    <label for="">Forma de pago</label>
+        <select @bind="res.Pago">
         <option value="0">Seleccione forma de pago</option>
-        @foreach (var formaDePago in FormasDePago)
+        @foreach (var pagos in Pagos)
         {
-            <option value="@formaDePago.Id">@formaDePago.Nombre</option>
+            <option value="@pagos.Id">@pagos.Pago</option>
         }
     </select>
-    </div>
+</div>
+
+
 <br>
   
 
@@ -88,21 +91,18 @@
 
     public ReservaUpdateRequest res {get; set;} = new ReservaUpdateRequest();
 
-
-
     private int SelectedVehicleId { get; set; }
     private ResultList<VehiculoRecord>? VehiculosRegistrados { get; set; }
     private string? ErrorMessage {get; set;}
 
-
     private int SelectedClientId {get; set;}
     private ResultList<ClienteRecord>? ClientesRegistrados {get; set;}
-    private List<FormaDePagoRecord> FormasDePago { get; set; } = new List<FormaDePagoRecord>()
-        {
-            new FormaDePagoRecord { Id = 1, Nombre = "Efectivo" },
-            new FormaDePagoRecord { Id = 1, Nombre = "Tarjeta" },    
-        };
 
+    private List<ReservaRecord> Pagos {get; set;} = new List<ReservaRecord>()
+        {
+            new ReservaRecord {Id = 1, Pago = "Efectivo" },
+            new ReservaRecord {Id = 2, Pago = "Tarjeta" },
+        };
 
 
     private decimal TotalRentalPrice => res.PrecioTotal * res.Dias;
@@ -110,26 +110,28 @@
 
 protected override async Task OnInitializedAsync()
 {
+       try
+    {
+        VehiculosRegistrados = await VehiculoManager.GetAsync() ?? new ResultList<VehiculoRecord>();
+    }
+    catch (Exception e)
+    {
+        ErrorMessage = "Ocurrió un error al obtener los vehículos: " + e.Message;
+        VehiculosRegistrados = new ResultList<VehiculoRecord>();
+    }
+
     try
-        {
-            VehiculosRegistrados = await VehiculoManager.GetAsync();
-        }
-        catch(Exception e)
-            {
-                ErrorMessage = "Ocurrio un error al obteenr los vehiculos" + e.Message;
-            }
-
-
-        try
-        {
-            ClientesRegistrados = await ClienteManager.GetAsync();
-        }
-        catch(Exception e)
-            {
-                ErrorMessage = "Ocurrio un error al obteenr los vehiculos" + e.Message;
-            }
-
-            
+    {
+        ClientesRegistrados = await ClienteManager.GetAsync() ?? new ResultList<ClienteRecord>();
+    }
+    catch (Exception e)
+    {
+        ErrorMessage = "Ocurrió un error al obtener los clientes: " + e.Message;
+        ClientesRegistrados = new ResultList<ClienteRecord>();
+    }
+    
+        
+     
 
     if(Id!=0){
         var resultado = await ReservaManager.GetByIdAsync(Id);
@@ -142,11 +144,13 @@ protected override async Task OnInitializedAsync()
             res.Dias = resultado.Data.Dias;
             res.PrecioTotal = resultado.Data.PrecioTotal;
             res.precioRenta = resultado.Data.precioRenta;
-            res.FormaDePagoId = resultado.Data.FormaDePagoId;
+            res.Pago = resultado.Data.Pago;
             StateHasChanged();
         }
     }
 }
+
+
 
 private void AsignarValoresSeleccionados()
 {
@@ -171,17 +175,18 @@ private void AsignarValoresSeleccionados()
             // ...
         }
     }
+
+
 }
+
 
 
 private void VerificarFormaDePagoSeleccionada()
 {
-    var formaDePagoSeleccionada = FormasDePago.FirstOrDefault(f => f.Id == res.FormaDePagoId);
-    if (formaDePagoSeleccionada != null)
+    var pagosSeleccionado = Pagos.FirstOrDefault(p => p.Pago == res.Pago);
+    if (pagosSeleccionado != null)
     {
-        // Realizar acciones específicas para la forma de pago seleccionada
-        Console.WriteLine("Forma de pago seleccionada: " + formaDePagoSeleccionada.Nombre);
-        // ...
+        Console.WriteLine("Forma de pago seleccionada: " + pagosSeleccionado.Pago);
     }
     else
     {
@@ -189,36 +194,67 @@ private void VerificarFormaDePagoSeleccionada()
     }
 }
 
+
+
 public async Task Send()
 {
     res.Dias = (int)(res.FechaFin - res.FechaInicio).TotalDays; 
-    // Calcula el precio total de la renta antes de enviar los datos
-    res.PrecioTotal  = res.Dias * res.precioRenta; 
+    res.PrecioTotal = res.Dias * res.precioRenta; 
 
     AsignarValoresSeleccionados();
-
+    
     VerificarFormaDePagoSeleccionada();
 
-    if(Id != 0)
+
+
+try
+{
+    // Código para guardar los cambios de entidad
+    if (Id != 0)
     {
-        var resulatdo = await ReservaManager.GetAsync();
-        if(resulatdo.Succeeded)
+        var resultado = await ReservaManager.UpdateAsync(Id, res);
+        if (resultado.Succeeded)
         {
             urlHelper.NavigateTo("/reservas");
-            return; // Agregamos un return para salir del método después de la redirección
+            return;
+        }
+        else
+        {
+            // Si la actualización no tiene éxito, puedes manejar el error de alguna manera,
+            // como mostrar un mensaje de error al usuario o registrar el error.
+            Console.WriteLine("Error al actualizar la reserva: " + resultado.Message?.FirstOrDefault());
         }
     }
     else
     {
         var resultado = await ReservaManager.CreateAsync(res);
-        if(resultado.Succeeded)
+        if (resultado.Succeeded)
         {
             urlHelper.NavigateTo("/reservas");
-            return; // Agregamos un return para salir del método después de la redirección
+            return;
+        }
+        else
+        {
+            // Si la creación no tiene éxito, puedes manejar el error de alguna manera,
+            // como mostrar un mensaje de error al usuario o registrar el error.
+            Console.WriteLine("Error al crear la reserva: " + resultado.Message?.FirstOrDefault());
         }
     }
 }
+catch (Exception ex)
+{
+    // Agrega un punto de interrupción en esta línea para inspeccionar la excepción
+    Console.WriteLine("Excepción capturada. Pausando la ejecución.");
+    Console.WriteLine("Presiona Enter para continuar...");
+
+    Console.ReadLine(); // Pausa la ejecución hasta que se presione Enter
+
+    // Capturar la excepción interna y mostrar su mensaje
+    Console.WriteLine("Excepción interna al guardar los cambios de entidad: " + ex.Message);
+}
 
 
+
+}
 
 }

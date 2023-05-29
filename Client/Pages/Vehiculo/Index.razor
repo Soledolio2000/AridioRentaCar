@@ -112,7 +112,7 @@ else
 @code
 {
 
-    private List<VehiculoRecord>? vehiculos;
+    private List<VehiculoRecord> vehiculos;
 
     
     private int cantidadAutosActivos;
@@ -129,6 +129,10 @@ else
             cantidadAutosInactivos = Vehiculos.Count(v => v.Activo == false); 
             }
         }
+
+
+
+
 
         public void Agregar()
         {

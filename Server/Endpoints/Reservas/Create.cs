@@ -38,7 +38,7 @@ public class Create : EndpointBaseAsync.WithRequest<Request>.WithActionResult<Re
             return Respuesta.Sucess(reserva.Id);
         }
         catch(Exception e){
-            return Respuesta.Fail(e.Message);
+            return Respuesta.Fail(e.InnerException.Message);
         }
     }
 }

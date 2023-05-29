@@ -14,7 +14,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<IClienteManager, ClienteManager>();
-builder.Services.AddScoped<IFormaDePagoManager, FormaDePagoManager>();
 builder.Services.AddScoped<IReservaManager, ReservaManager>();
 builder.Services.AddScoped<IUsuarioManager, UsuarioManager>();
 builder.Services.AddScoped<IUsuarioRolManager, UsuarioRolManager>();

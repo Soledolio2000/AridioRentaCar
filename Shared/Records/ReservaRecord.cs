@@ -7,7 +7,7 @@ public class ReservaRecord
     {
     }
 
-    public ReservaRecord(int id, DateTime fechaInicio, DateTime fechaFin, int vehiculoId, VehiculoRecord vehiculo, int clienteId, ClienteRecord cliente, int dias, decimal precioTotal, decimal preciorenta, int formaDePagoId, FormaDePagoRecord formaDePago)
+    public ReservaRecord(int id, DateTime fechaInicio, DateTime fechaFin, int vehiculoId, VehiculoRecord vehiculo, int clienteId, ClienteRecord cliente, int dias, decimal precioTotal, decimal preciorenta, string pago)
     {
         Id = id;
         FechaInicio = fechaInicio;
@@ -19,8 +19,7 @@ public class ReservaRecord
         Dias = dias;
         PrecioTotal = precioTotal;
         precioRenta = preciorenta;
-        FormaDePagoId = formaDePagoId;
-        FormaDePago = formaDePago;
+        Pago = pago;
     }
 
     public int Id { get; set; }
@@ -33,6 +32,5 @@ public class ReservaRecord
     public int Dias { get; set; }
     public decimal PrecioTotal { get; set; }
     public decimal precioRenta { get; set; }
-    public int FormaDePagoId { get; set; }
-    public virtual FormaDePagoRecord FormaDePago { get; set; } = null!;
+    public string Pago {get;set;} = null!; 
 }

@@ -33,19 +33,6 @@ namespace Aridio_Rent_A_Car.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FormasDePago",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FormasDePago", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UsuariosRoles",
                 columns: table => new
                 {
@@ -117,7 +104,7 @@ namespace Aridio_Rent_A_Car.Server.Migrations
                     Dias = table.Column<int>(type: "int", nullable: false),
                     PrecioTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     precioRenta = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    FormaDePagoId = table.Column<int>(type: "int", nullable: false)
+                    Pago = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -126,12 +113,6 @@ namespace Aridio_Rent_A_Car.Server.Migrations
                         name: "FK_Reservas_Clientes_ClienteId",
                         column: x => x.ClienteId,
                         principalTable: "Clientes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Reservas_FormasDePago_FormaDePagoId",
-                        column: x => x.FormaDePagoId,
-                        principalTable: "FormasDePago",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -146,11 +127,6 @@ namespace Aridio_Rent_A_Car.Server.Migrations
                 name: "IX_Reservas_ClienteId",
                 table: "Reservas",
                 column: "ClienteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reservas_FormaDePagoId",
-                table: "Reservas",
-                column: "FormaDePagoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservas_VehiculoId",
@@ -174,9 +150,6 @@ namespace Aridio_Rent_A_Car.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "Clientes");
-
-            migrationBuilder.DropTable(
-                name: "FormasDePago");
 
             migrationBuilder.DropTable(
                 name: "Vehiculos");

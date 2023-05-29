@@ -40,11 +40,21 @@ public class ReservaManager : IReservaManager
         }
     }
 
-    public async Task<Result<int>> CreateAsync(ReservaCreateRequest request)
+public async Task<Result<int>> CreateAsync(ReservaCreateRequest request)
+{
+    try
     {
-        var response = await httpClient.PostAsJsonAsync(ReservaRouteManager.BASE,request);
+        var response = await httpClient.PostAsJsonAsync(ReservaRouteManager.BASE, request);
         return await response.ToResult<int>();
     }
+    catch (Exception e)
+    {
+        // Registra la excepción o muestra su mensaje en la consola para fines de depuración
+        Console.WriteLine("Error al guardar los cambios de entidad: " + e.Message);
+        // También puedes lanzar una excepción personalizada o retornar un Resultado.Fail si lo prefieres
+        return Result<int>.Fail("Error al guardar los cambios de entidad. Consulta el registro para obtener más detalles.");
+    }
+}
 
     public async Task<Result<ReservaRecord>> GetByIdAsync(int Id)
     {
@@ -76,9 +86,11 @@ public async Task<Result<ReservaRecord>> UpdateAsync(int id, ReservaUpdateReques
     }
     catch (Exception e)
     {
-        return Result<ReservaRecord>.Fail(e.Message);
+        Console.WriteLine("Error al guardar los cambios de entidad: " + e.Message);
+        return Result<ReservaRecord>.Fail("Error al guardar los cambios de entidad. Consulta el registro para obtener más detalles.");
     }
 }
+
 
 
 }
