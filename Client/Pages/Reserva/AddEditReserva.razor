@@ -48,7 +48,7 @@
 <br>
     <div class="form-group">
         <label for="duracion">Duración de la renta ("Dias"):</label>
-        <input type="number" id="duracion" @bind="res.Dias" />
+        <input type="number" id="duracion" @bind="res.Dias"  readonly/>
     </div>
 <br>
     <div class="form-group">
@@ -64,7 +64,13 @@
 <br>
     <div class="form-group">
         <label>Forma de Pago</label>
-        <input type="text" @bind="res.FormaDePagoId">
+    <select @bind="res.FormaDePagoId">
+        <option value="0">Seleccione forma de pago</option>
+        @foreach (var formaDePago in FormasDePago)
+        {
+            <option value="@formaDePago.Id">@formaDePago.Nombre</option>
+        }
+    </select>
     </div>
 <br>
   
@@ -91,6 +97,12 @@
 
     private int SelectedClientId {get; set;}
     private ResultList<ClienteRecord>? ClientesRegistrados {get; set;}
+    private List<FormaDePagoRecord> FormasDePago { get; set; } = new List<FormaDePagoRecord>()
+        {
+            new FormaDePagoRecord { Id = 1, Nombre = "Efectivo" },
+            new FormaDePagoRecord { Id = 1, Nombre = "Tarjeta" },    
+        };
+
 
 
     private decimal TotalRentalPrice => res.PrecioTotal * res.Dias;
@@ -117,7 +129,7 @@ protected override async Task OnInitializedAsync()
                 ErrorMessage = "Ocurrio un error al obteenr los vehiculos" + e.Message;
             }
 
-
+            
 
     if(Id!=0){
         var resultado = await ReservaManager.GetByIdAsync(Id);
@@ -136,11 +148,56 @@ protected override async Task OnInitializedAsync()
     }
 }
 
-public async void Send()
+private void AsignarValoresSeleccionados()
 {
+    if (SelectedVehicleId != 0)
+    {
+        var vehiculoSeleccionado = VehiculosRegistrados?.Items.FirstOrDefault(v => v.Id == SelectedVehicleId);
+        if (vehiculoSeleccionado != null)
+        {
+            res.VehiculoId = SelectedVehicleId;
+            // Realizar la reserva con el vehículo seleccionado
+            // ...
+        }
+    }
 
+    if (SelectedClientId != 0)
+    {
+        var clienteSeleccionado = ClientesRegistrados?.Items.FirstOrDefault(c => c.Id == SelectedClientId);
+        if (clienteSeleccionado != null)
+        {
+            res.ClienteId = SelectedClientId;
+            // Realizar la reserva con el cliente seleccionado
+            // ...
+        }
+    }
+}
+
+
+private void VerificarFormaDePagoSeleccionada()
+{
+    var formaDePagoSeleccionada = FormasDePago.FirstOrDefault(f => f.Id == res.FormaDePagoId);
+    if (formaDePagoSeleccionada != null)
+    {
+        // Realizar acciones específicas para la forma de pago seleccionada
+        Console.WriteLine("Forma de pago seleccionada: " + formaDePagoSeleccionada.Nombre);
+        // ...
+    }
+    else
+    {
+        Console.WriteLine("No se ha seleccionado una forma de pago válida.");
+    }
+}
+
+public async Task Send()
+{
+    res.Dias = (int)(res.FechaFin - res.FechaInicio).TotalDays; 
     // Calcula el precio total de la renta antes de enviar los datos
-    res.PrecioTotal  = res.Dias * res.precioRenta;
+    res.PrecioTotal  = res.Dias * res.precioRenta; 
+
+    AsignarValoresSeleccionados();
+
+    VerificarFormaDePagoSeleccionada();
 
     if(Id != 0)
     {
@@ -148,6 +205,7 @@ public async void Send()
         if(resulatdo.Succeeded)
         {
             urlHelper.NavigateTo("/reservas");
+            return; // Agregamos un return para salir del método después de la redirección
         }
     }
     else
@@ -156,46 +214,10 @@ public async void Send()
         if(resultado.Succeeded)
         {
             urlHelper.NavigateTo("/reservas");
-        }
-    }
-
-
-    
-
-     urlHelper.NavigateTo("/reservas");
-}
-
-private void Reservar()
-{
-    if (SelectedVehicleId != 0)
-    {
-        var vehiculoSeleccionado = VehiculosRegistrados?.Items.FirstOrDefault(v => v.Id == SelectedVehicleId);
-        if (vehiculoSeleccionado != null)
-        {
-             res.VehiculoId = SelectedVehicleId;
-            // Realizar la reserva con el vehículo seleccionado
-            // ...
+            return; // Agregamos un return para salir del método después de la redirección
         }
     }
 }
-
-
-private void Clientela()
-{
-    if (SelectedClientId != 0)
-    {
-        var clienteSeleccionado = ClientesRegistrados?.Items.FirstOrDefault(c => c.Id == SelectedClientId);
-        if (clienteSeleccionado != null)
-        {
-             res.ClienteId = SelectedClientId;
-            // Realizar la reserva con el vehículo seleccionado
-            // ...
-        }
-    }
-
-}
-
-
 
 
 

@@ -13,6 +13,8 @@ public interface IReservaManager
     Task<Result<int>> CreateAsync(ReservaCreateRequest request);
     Task<Result<ReservaRecord>> GetByIdAsync(int Id);
     Task<Result> DeleteAsync(int id);
+    Task<Result<ReservaRecord>> UpdateAsync(int id, ReservaUpdateRequest request);
+
 }
 
 public class ReservaManager : IReservaManager
@@ -63,5 +65,20 @@ public class ReservaManager : IReservaManager
         return Result.Fail(e.Message);
     }
 }
+
+
+public async Task<Result<ReservaRecord>> UpdateAsync(int id, ReservaUpdateRequest request)
+{
+    try
+    {
+        var response = await httpClient.PutAsJsonAsync(ReservaRouteManager.BuildRoute(id), request);
+        return await response.ToResult<ReservaRecord>();
+    }
+    catch (Exception e)
+    {
+        return Result<ReservaRecord>.Fail(e.Message);
+    }
+}
+
 
 }
