@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Aridio_Rent_A_Car.Server.Context;
 
 public interface IMyDbContext
+
 {
     DbSet<Cliente> Clientes { get; set; }
     DbSet<Reserva> Reservas { get; set; }
